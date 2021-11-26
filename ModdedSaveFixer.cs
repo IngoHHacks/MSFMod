@@ -113,24 +113,36 @@ namespace ModdedSaveFixer
 
                 if (currentAbilities.ContainsValue(oldName))
                 {
-                    ProgressionData.Data.learnedAbilities.Remove(ability);
+                    bool removed = false;
+                    if (ProgressionData.Data.learnedAbilities.Contains(ability))
+                    {
+                        ProgressionData.Data.learnedAbilities.Remove(ability);
+                        removed = true;
+                    }
                     int key = currentAbilities.FirstOrDefault(x => x.Value == oldName).Key;
                     if (key > 99)
                     {
                         ProgressionData.Data.learnedAbilities.Add((Ability)key);
                         storedAbilities[index] = name;
-                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + ")");
+                        if (removed) Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + "). The save file has been modified to reflect this change.");
+                        else Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + ")");
                     }
                     else
                     {
-                        Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the save file.");
+                        if (removed) Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the auxiliary file and save file.");
+                        else Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the auxiliary file.");
                     }
                 }
                 else
                 {
                     storedAbilities[index] = name;
-                    ProgressionData.Data.learnedAbilities.Remove(ability);
-                    Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the save file.");
+                    if (ProgressionData.Data.learnedAbilities.Contains(ability)) {
+                        ProgressionData.Data.learnedAbilities.Remove(ability);
+                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the auxiliary file and save file.");
+                    } else
+                    {
+                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the auxiliary file.");
+                    }
                 }
             }
 
@@ -138,8 +150,15 @@ namespace ModdedSaveFixer
             {
                 if (!currentAbilities.ContainsValue(pair.Value))
                 {
-                    ProgressionData.Data.learnedAbilities.Remove((Ability)pair.Key);
-                    Log.LogWarning("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the save file.");
+                    if (ProgressionData.Data.learnedAbilities.Contains((Ability)pair.Key))
+                    {
+                        ProgressionData.Data.learnedAbilities.Remove((Ability)pair.Key);
+                        Log.LogWarning("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the auxiliarey file and save file.");
+                    }
+                    else
+                    {
+                        Log.LogInfo("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the auxiliary file.");
+                    }
                 }
             }
 
