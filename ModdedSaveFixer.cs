@@ -89,7 +89,7 @@ namespace ModdedSaveFixer
                 else if (storedAbilities[index] != name)
                 {
                     // If stored but name is different, add as discrepancy.
-                    if (ProgressionData.Data.learnedAbilities.Contains((Ability)index)) discrepancies.Add(na, storedAbilities[index]);
+                    discrepancies.Add(na, storedAbilities[index]);
                 }
                 currentAbilities.Add(index, name);
             }
