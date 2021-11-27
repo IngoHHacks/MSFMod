@@ -37,7 +37,10 @@ namespace ModdedSaveFixer
             [HarmonyBefore("IngoH.inscryption.SkipStartScreen")]
             public static bool Prefix(StartScreenController __instance)
             {
-                FixSave();
+                if (!startedGame)
+                {
+                    FixSave();
+                }
                 return true;
             }
         }
