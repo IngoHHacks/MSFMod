@@ -17,7 +17,7 @@ namespace ModdedSaveFixer
     {
         private const string PluginGuid = "IngoH.inscryption.ModdedSaveFixer";
         private const string PluginName = "ModdedSaveFixer";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "1.0.2";
 
         internal static ManualLogSource Log;
 
@@ -37,10 +37,7 @@ namespace ModdedSaveFixer
             [HarmonyBefore("IngoH.inscryption.SkipStartScreen")]
             public static bool Prefix(StartScreenController __instance)
             {
-                if (!startedGame)
-                {
-                    FixSave();
-                }
+                FixSave();
                 return true;
             }
         }
@@ -71,7 +68,7 @@ namespace ModdedSaveFixer
             {
                 NewAbility na = NewAbility.abilities[i];
                 Ability ability = na.ability;
-                int index = (int)ability;
+                int index = (int) ability;
                 string name;
                 if (na.id != null)
                 {
@@ -92,7 +89,7 @@ namespace ModdedSaveFixer
                 else if (storedAbilities[index] != name)
                 {
                     // If stored but name is different, add as discrepancy.
-                    discrepancies.Add(na, storedAbilities[index]);
+                    if (ProgressionData.Data.learnedAbilities.Contains((Ability) index)) discrepancies.Add(na, storedAbilities[index]);
                 }
                 currentAbilities.Add(index, name);
             }
@@ -116,36 +113,24 @@ namespace ModdedSaveFixer
 
                 if (currentAbilities.ContainsValue(oldName))
                 {
-                    bool removed = false;
-                    if (ProgressionData.Data.learnedAbilities.Contains(ability))
-                    {
-                        ProgressionData.Data.learnedAbilities.Remove(ability);
-                        removed = true;
-                    }
+                    ProgressionData.Data.learnedAbilities.Remove(ability);
                     int key = currentAbilities.FirstOrDefault(x => x.Value == oldName).Key;
                     if (key > 99)
                     {
-                        ProgressionData.Data.learnedAbilities.Add((Ability)key);
+                        ProgressionData.Data.learnedAbilities.Add((Ability) key);
                         storedAbilities[index] = name;
-                        if (removed) Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + "). The save file has been modified to reflect this change.");
-                        else Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + ")");
+                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been moved to the correct index (" + key + ")");
                     }
                     else
                     {
-                        if (removed) Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the auxiliary file and save file.");
-                        else Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the auxiliary file.");
+                        Log.LogError("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). Tried to move the learned ability, but failed. The learned ability " + "(" + oldName + ") has been removed from the save file.");
                     }
                 }
                 else
                 {
                     storedAbilities[index] = name;
-                    if (ProgressionData.Data.learnedAbilities.Contains(ability)) {
-                        ProgressionData.Data.learnedAbilities.Remove(ability);
-                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the auxiliary file and save file.");
-                    } else
-                    {
-                        Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the auxiliary file.");
-                    }
+                    ProgressionData.Data.learnedAbilities.Remove(ability);
+                    Log.LogWarning("Ability discrepancy detected: " + name + " is now stored at index " + index + " (was " + oldName + "). The learned ability " + "(" + oldName + ") has been removed from the save file.");
                 }
             }
 
@@ -153,15 +138,8 @@ namespace ModdedSaveFixer
             {
                 if (!currentAbilities.ContainsValue(pair.Value))
                 {
-                    if (ProgressionData.Data.learnedAbilities.Contains((Ability)pair.Key))
-                    {
-                        ProgressionData.Data.learnedAbilities.Remove((Ability)pair.Key);
-                        Log.LogWarning("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the auxiliarey file and save file.");
-                    }
-                    else
-                    {
-                        Log.LogInfo("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the auxiliary file.");
-                    }
+                    ProgressionData.Data.learnedAbilities.Remove((Ability) pair.Key);
+                    Log.LogWarning("Ability removed: " + pair.Value + ". The learned ability " + "(" + pair.Key + ") has been removed from the save file.");
                 }
             }
 
@@ -177,7 +155,7 @@ namespace ModdedSaveFixer
             foreach (KeyValuePair<int, string> pair in removedAbilities)
             {
                 int index = pair.Key;
-                Ability ability = (Ability)pair.Key;
+                Ability ability = (Ability) pair.Key;
                 if (pair.Key > 99 && ProgressionData.Data.learnedAbilities.Contains(ability))
                 {
                     ProgressionData.Data.learnedAbilities.Remove(ability);
@@ -189,7 +167,7 @@ namespace ModdedSaveFixer
             for (int i = ProgressionData.Data.learnedAbilities.Count - 1; i >= 0; i--)
             {
                 Ability ability = ProgressionData.Data.learnedAbilities[i];
-                int index = (int)ability;
+                int index = (int) ability;
                 if (index > 99 && !currentAbilities.ContainsKey(index))
                 {
                     ProgressionData.Data.learnedAbilities.Remove(ability);
