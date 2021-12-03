@@ -5,5 +5,8 @@ More save-fixing features, such as cards/consumables and mid-run mod-changing er
 
 ### Changelog ###
 
+#### 1.0.4
+- Ability None is now also cleared.
+
 #### 1.0.1
 - Fixed node-skipping bug.

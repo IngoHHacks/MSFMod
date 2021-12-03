@@ -17,7 +17,7 @@ namespace ModdedSaveFixer
     {
         private const string PluginGuid = "IngoH.inscryption.ModdedSaveFixer";
         private const string PluginName = "ModdedSaveFixer";
-        private const string PluginVersion = "1.0.3";
+        private const string PluginVersion = "1.0.4";
 
         internal static ManualLogSource Log;
 
@@ -171,7 +171,7 @@ namespace ModdedSaveFixer
             {
                 Ability ability = ProgressionData.Data.learnedAbilities[i];
                 int index = (int) ability;
-                if (index > 99 && !currentAbilities.ContainsKey(index))
+                if ((index > 99 || index == 0) && !currentAbilities.ContainsKey(index))
                 {
                     ProgressionData.Data.learnedAbilities.Remove(ability);
                     Log.LogWarning("Removing invalid ability from save file: " + index + " (original name is unknown - it was likely removed before installing this mod)");
