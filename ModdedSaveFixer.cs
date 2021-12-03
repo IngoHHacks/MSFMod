@@ -17,7 +17,7 @@ namespace ModdedSaveFixer
     {
         private const string PluginGuid = "IngoH.inscryption.ModdedSaveFixer";
         private const string PluginName = "ModdedSaveFixer";
-        private const string PluginVersion = "1.0.2";
+        private const string PluginVersion = "1.0.3";
 
         internal static ManualLogSource Log;
 
@@ -37,7 +37,10 @@ namespace ModdedSaveFixer
             [HarmonyBefore("IngoH.inscryption.SkipStartScreen")]
             public static bool Prefix(StartScreenController __instance)
             {
-                FixSave();
+                if (!startedGame)
+                {
+                    FixSave();
+                }
                 return true;
             }
         }
