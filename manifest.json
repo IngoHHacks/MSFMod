@@ -1,6 +1,6 @@
 {
     "name": "Modded_Save_Fixer",
-    "version_number": "1.0.4",
+    "version_number": "1.1.0",
     "website_url": "https://github.com/IngoHHacks/MSFMod",
     "description": "A mod to fix modded save files.",
     "dependencies": [

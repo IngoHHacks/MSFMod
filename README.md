@@ -5,8 +5,17 @@ More save-fixing features, such as cards/consumables and mid-run mod-changing er
 
 ### Changelog ###
 
+#### 1.1.0
+- Invalid (death) cards and existing totems are now supported for removal
+
 #### 1.0.4
 - Ability None is now also cleared.
+
+#### 1.0.3
+- Small fix (again)
+
+#### 1.0.2
+- Small fix
 
 #### 1.0.1
 - Fixed node-skipping bug.
